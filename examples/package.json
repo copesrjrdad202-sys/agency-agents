@@ -1,0 +1,32 @@
+{
+  "name": "multi-agent-prototype-google-calendar",
+  "version": "0.1.0",
+  "private": true,
+  "main": "googleCalendarConnector.ts",
+  "scripts": {
+    "start:connector": "ts-node-dev --respawn --transpile-only googleCalendarConnector.ts",
+    "start:business": "ts-node-dev --respawn --transpile-only businessContextAgent.ts",
+    "start:intake": "ts-node-dev --respawn --transpile-only intakeAgent.ts",
+    "start:automation": "ts-node-dev --respawn --transpile-only automationAgent.ts",
+    "start:invoice": "ts-node-dev --respawn --transpile-only invoiceAgent.ts",
+    "start:payment": "ts-node-dev --respawn --transpile-only paymentAgent.ts",
+    "start:tax": "ts-node-dev --respawn --transpile-only taxAgent.ts",
+    "start:stripe": "ts-node-dev --respawn --transpile-only stripeConnector.ts",
+    "start:twilio": "ts-node-dev --respawn --transpile-only twilioConnector.ts",
+    "onboard": "ts-node-dev --respawn --transpile-only onboardGoogleClient.ts"
+  },
+  "dependencies": {
+    "googleapis": "^118.0.0",
+    "express": "^4.18.2",
+    "body-parser": "^1.20.2",
+    "dotenv": "^16.0.3",
+    "axios": "^1.4.0",
+    "open": "^8.4.0"
+  },
+  "devDependencies": {
+    "ts-node-dev": "^2.0.0",
+    "typescript": "^5.4.0",
+    "@types/express": "^4.17.17",
+    "@types/node": "^20.2.5"
+  }
+}
