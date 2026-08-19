@@ -11,22 +11,24 @@
     "start:invoice": "ts-node-dev --respawn --transpile-only invoiceAgent.ts",
     "start:payment": "ts-node-dev --respawn --transpile-only paymentAgent.ts",
     "start:tax": "ts-node-dev --respawn --transpile-only taxAgent.ts",
-    "start:stripe": "ts-node-dev --respawn --transpile-only stripeConnector.ts",
-    "start:twilio": "ts-node-dev --respawn --transpile-only twilioConnector.ts",
+    "start:stripe": "ts-node-dev --respawn --transpile-only stripeConnectorLive.ts",
+    "start:twilio": "ts-node-dev --respawn --transpile-only twilioConnectorLive.ts",
     "onboard": "ts-node-dev --respawn --transpile-only onboardGoogleClient.ts"
   },
   "dependencies": {
-    "googleapis": "^118.0.0",
-    "express": "^4.18.2",
+    "axios": "^1.4.0",
     "body-parser": "^1.20.2",
     "dotenv": "^16.0.3",
-    "axios": "^1.4.0",
-    "open": "^8.4.0"
+    "express": "^4.18.2",
+    "googleapis": "^118.0.0",
+    "open": "^8.4.0",
+    "stripe": "^22.5.0",
+    "twilio": "^6.1.0"
   },
   "devDependencies": {
-    "ts-node-dev": "^2.0.0",
-    "typescript": "^5.4.0",
     "@types/express": "^4.17.17",
-    "@types/node": "^20.2.5"
+    "@types/node": "^20.2.5",
+    "ts-node-dev": "^2.0.0",
+    "typescript": "^5.4.0"
   }
 }
