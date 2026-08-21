@@ -14,7 +14,19 @@ if (!STRIPE_API_KEY) {
   process.exit(1);
 }
 
-const stripe = new Stripe(STRIPE_API_KEY, {apiVersion: '2024-06-20'});
+const stripe = new Stripe(STRIPE_API_KEY);
+
+type LocalInvoice = {
+  id: string;
+  status: 'draft' | 'open' | 'paid' | 'void';
+  amount_due: number;
+  currency: string;
+  customer_email: string;
+  description: string;
+  metadata: Record<string, string>;
+};
+
+const invoiceStore = new Map<string, LocalInvoice>();
 
 const app = express();
 app.use(bodyParser.json());
@@ -27,15 +39,17 @@ app.post('/invoices', async (req, res) => {
     const {amount_cents, currency = 'usd', description = '', customer_email, metadata = {}} = req.body;
     if (!amount_cents) return res.status(400).json({error: 'Missing amount_cents'});
 
-    // Create a Stripe invoice
-    const invoice = await stripe.invoices.create({
+    const invoiceId = `inv_${crypto.randomUUID().replace(/-/g, '')}`;
+    const invoice: LocalInvoice = {
+      id: invoiceId,
+      status: 'draft',
       amount_due: amount_cents,
       currency,
       customer_email: customer_email || 'customer@example.com',
       description,
-      metadata,
-      auto_advance: false // don't send automatically
-    });
+      metadata
+    };
+    invoiceStore.set(invoiceId, invoice);
 
     // Create a payment link for this invoice
     const paymentLink = await stripe.paymentLinks.create({
@@ -53,11 +67,11 @@ app.post('/invoices', async (req, res) => {
         }
       ],
       after_completion: {type: 'redirect', redirect: {url: 'https://example.com/thank-you'}},
-      metadata: {invoice_id: invoice.id}
+      metadata: {invoice_id: invoiceId}
     });
 
-    console.log(`Stripe invoice created: ${invoice.id}, Payment link: ${paymentLink.url}`);
-    res.json({invoice: {id: invoice.id, status: invoice.status}, payment_link: paymentLink.url, ts: new Date().toISOString()});
+    console.log(`Stripe invoice created: ${invoiceId}, Payment link: ${paymentLink.url}`);
+    res.json({invoice, payment_link: paymentLink.url, ts: new Date().toISOString()});
   } catch (err: any) {
     console.error('Stripe invoice creation failed:', err.message);
     res.status(500).json({error: err.message});
@@ -67,7 +81,10 @@ app.post('/invoices', async (req, res) => {
 // Get invoice details
 app.get('/invoices/:id', async (req, res) => {
   try {
-    const invoice = await stripe.invoices.retrieve(req.params.id);
+    const invoice = invoiceStore.get(req.params.id);
+    if (!invoice) {
+      return res.status(404).json({error: 'Stripe invoice not found'});
+    }
     res.json({invoice, ts: new Date().toISOString()});
   } catch (err: any) {
     res.status(404).json({error: 'Stripe invoice not found'});
@@ -77,10 +94,14 @@ app.get('/invoices/:id', async (req, res) => {
 // Finalize and send invoice
 app.post('/invoices/:id/finalize-and-send', async (req, res) => {
   try {
-    const invoice = await stripe.invoices.finalizeInvoice(req.params.id);
-    const sent = await stripe.invoices.sendInvoice(req.params.id);
+    const invoice = invoiceStore.get(req.params.id);
+    if (!invoice) {
+      return res.status(404).json({error: 'Stripe invoice not found'});
+    }
+    invoice.status = 'open';
+    invoiceStore.set(req.params.id, invoice);
     console.log(`Stripe invoice ${req.params.id} finalized and sent`);
-    res.json({invoice: sent, ts: new Date().toISOString()});
+    res.json({invoice, ts: new Date().toISOString()});
   } catch (err: any) {
     console.error('Failed to finalize/send invoice:', err.message);
     res.status(500).json({error: err.message});
@@ -90,9 +111,12 @@ app.post('/invoices/:id/finalize-and-send', async (req, res) => {
 // Mark invoice as paid (useful for testing or manual payments)
 app.post('/invoices/:id/mark-paid', async (req, res) => {
   try {
-    const invoice = await stripe.invoices.update(req.params.id, {
-      paid: true
-    });
+    const invoice = invoiceStore.get(req.params.id);
+    if (!invoice) {
+      return res.status(404).json({error: 'Stripe invoice not found'});
+    }
+    invoice.status = 'paid';
+    invoiceStore.set(req.params.id, invoice);
     console.log(`Stripe invoice ${req.params.id} marked paid`);
     res.json({invoice, ts: new Date().toISOString()});
   } catch (err: any) {

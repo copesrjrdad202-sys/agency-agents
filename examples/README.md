@@ -46,3 +46,26 @@ If you run an interesting multi-agent exercise, consider adding it here. Good ex
 - Multiple agents collaborating on a shared objective
 - The breadth of the agency's capabilities
 - Real-world applicability of the agent definitions
+
+## Production Scaffold
+
+If you're preparing a launch build from this prototype, use:
+
+- `npm run typecheck`
+- `npm run build`
+- `npm run validate:prod`
+- `npm run package:prod`
+
+GitHub Actions deploy scaffold:
+
+- `.github/workflows/deploy-examples.yml`
+
+Required production secrets:
+
+- `STRIPE_SECRET_KEY`
+- `STRIPE_WEBHOOK_SECRET`
+- `TWILIO_ACCOUNT_SID`
+- `TWILIO_AUTH_TOKEN`
+- `TWILIO_PHONE_NUMBER`
+- `GOOGLE_CLIENT_ID`
+- `GOOGLE_CLIENT_SECRET`

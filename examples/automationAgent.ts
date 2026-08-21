@@ -23,7 +23,8 @@ app.post('/process', async (req, res) => {
     const bresp = await axios.get(`${BUSINESS_CONTEXT}/${encodeURIComponent(business_id)}`);
     business = bresp.data.business;
   } catch (err) {
-    console.warn('Failed to load business profile', err?.message || err);
+    const message = err instanceof Error ? err.message : String(err);
+    console.warn('Failed to load business profile', message);
   }
 
   // Decision logic (prototype)
@@ -40,8 +41,9 @@ app.post('/process', async (req, res) => {
       const cresp = await axios.post(`${CALENDAR_CONNECTOR_BASE}/events`, event, {timeout: 5000});
       return res.json({action: 'booked', calendar_response: cresp.data, ts: new Date().toISOString()});
     } catch (err: any) {
-      console.error('Calendar booking failed', err?.message || err);
-      return res.status(502).json({action: 'error', error: err?.message || String(err)});
+      const message = err instanceof Error ? err.message : String(err);
+      console.error('Calendar booking failed', message);
+      return res.status(502).json({action: 'error', error: message});
     }
   }
 

@@ -1,0 +1,80 @@
+{
+  "name": "multi-agent-prototype-production",
+  "environment": "production",
+  "services": [
+    {
+      "name": "business-context",
+      "entrypoint": "businessContextAgent.ts",
+      "port": 3100,
+      "kind": "agent",
+      "scope": "read-write"
+    },
+    {
+      "name": "automation",
+      "entrypoint": "automationAgent.ts",
+      "port": 3200,
+      "kind": "agent",
+      "scope": "orchestrator"
+    },
+    {
+      "name": "intake",
+      "entrypoint": "intakeAgent.ts",
+      "port": 3300,
+      "kind": "agent",
+      "scope": "read-write"
+    },
+    {
+      "name": "invoice",
+      "entrypoint": "invoiceAgent.ts",
+      "port": 3400,
+      "kind": "agent",
+      "scope": "billing-write"
+    },
+    {
+      "name": "payment",
+      "entrypoint": "paymentAgent.ts",
+      "port": 3600,
+      "kind": "agent",
+      "scope": "accounting-write"
+    },
+    {
+      "name": "tax",
+      "entrypoint": "taxAgent.ts",
+      "port": 3700,
+      "kind": "agent",
+      "scope": "ledger-write"
+    },
+    {
+      "name": "stripe-live",
+      "entrypoint": "stripeConnectorLive.ts",
+      "port": 3500,
+      "kind": "connector",
+      "scope": "stripe-write"
+    },
+    {
+      "name": "twilio-live",
+      "entrypoint": "twilioConnectorLive.ts",
+      "port": 3800,
+      "kind": "connector",
+      "scope": "twilio-write"
+    }
+  ],
+  "requiredSecrets": [
+    "STRIPE_SECRET_KEY",
+    "STRIPE_WEBHOOK_SECRET",
+    "TWILIO_ACCOUNT_SID",
+    "TWILIO_AUTH_TOKEN",
+    "TWILIO_PHONE_NUMBER",
+    "GOOGLE_CLIENT_ID",
+    "GOOGLE_CLIENT_SECRET"
+  ],
+  "requiredFiles": [
+    "data/businesses.json"
+  ],
+  "deploymentNotes": [
+    "Keep business data in encrypted storage in production.",
+    "Validate webhook signatures before processing payments or messages.",
+    "Use separate secrets per environment and per platform.",
+    "Do not reuse test credentials in production."
+  ]
+}

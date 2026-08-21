@@ -65,7 +65,7 @@ async function createEvent(oauth2Client: any, event: any, calendarId = 'primary'
   const calendar = google.calendar({version: 'v3', auth: oauth2Client});
   const res = await calendar.events.insert({
     calendarId,
-    resource: event,
+    requestBody: event,
     sendUpdates: 'all'
   });
   return res.data;

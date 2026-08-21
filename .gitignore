@@ -55,6 +55,8 @@ coverage/
 # Build outputs
 dist/
 build/
+examples/dist/
+examples/release/
 *.egg-info/
 
 # Personal notes and scratch files
