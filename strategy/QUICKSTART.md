@@ -87,6 +87,7 @@ Brand Guardian reviews all content before publishing.
 Analytics Reporter tracks performance daily.
 Growth Hacker optimizes channels weekly.
 Social Media Automation Agent owns separate platform keys and enforces publish scopes.
+Business Context Agent, Calendar Agent, Invoice Agent, Payment Agent, and P&L Dashboard Agent close the loop from lead to revenue.
 ```
 
 ### Conduct a Compliance Audit

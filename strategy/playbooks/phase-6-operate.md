@@ -204,6 +204,18 @@ Platform-Specific:
 - Reddit Community Builder → Daily authentic engagement
 ```
 
+### Social-to-Service Flywheel (Social Media Strategist + Service Agents)
+
+```
+- Social Media Automation Agent routes approved posts through separate platform keys
+- Business Context Agent maps incoming leads to the correct business profile
+- Calendar Agent converts social interest into booked appointments
+- Invoice Agent turns completed work into invoices
+- Payment Agent closes the transaction loop
+- P&L Dashboard Agent reports campaign-to-cash performance
+- Support Responder requests reviews and follow-up proof
+```
+
 ## Financial Operations
 
 ### Monthly Financial Review (Finance Tracker)
