@@ -3,6 +3,7 @@ import bodyParser from 'body-parser';
 import Stripe from 'stripe';
 import dotenv from 'dotenv';
 import crypto from 'crypto';
+import { getInvoice, upsertInvoice } from './persistentDb';
 
 dotenv.config();
 const PORT = process.env.STRIPE_CONNECTOR_PORT || 3500;
@@ -26,8 +27,6 @@ type LocalInvoice = {
   metadata: Record<string, string>;
 };
 
-const invoiceStore = new Map<string, LocalInvoice>();
-
 const app = express();
 app.use(bodyParser.json());
 
@@ -49,7 +48,7 @@ app.post('/invoices', async (req, res) => {
       description,
       metadata
     };
-    invoiceStore.set(invoiceId, invoice);
+    upsertInvoice(invoice);
 
     // Create a payment link for this invoice
     const paymentLink = await stripe.paymentLinks.create({
@@ -81,7 +80,7 @@ app.post('/invoices', async (req, res) => {
 // Get invoice details
 app.get('/invoices/:id', async (req, res) => {
   try {
-    const invoice = invoiceStore.get(req.params.id);
+    const invoice = getInvoice(req.params.id);
     if (!invoice) {
       return res.status(404).json({error: 'Stripe invoice not found'});
     }
@@ -94,12 +93,12 @@ app.get('/invoices/:id', async (req, res) => {
 // Finalize and send invoice
 app.post('/invoices/:id/finalize-and-send', async (req, res) => {
   try {
-    const invoice = invoiceStore.get(req.params.id);
+    const invoice = getInvoice(req.params.id);
     if (!invoice) {
       return res.status(404).json({error: 'Stripe invoice not found'});
     }
     invoice.status = 'open';
-    invoiceStore.set(req.params.id, invoice);
+    upsertInvoice(invoice);
     console.log(`Stripe invoice ${req.params.id} finalized and sent`);
     res.json({invoice, ts: new Date().toISOString()});
   } catch (err: any) {
@@ -111,12 +110,12 @@ app.post('/invoices/:id/finalize-and-send', async (req, res) => {
 // Mark invoice as paid (useful for testing or manual payments)
 app.post('/invoices/:id/mark-paid', async (req, res) => {
   try {
-    const invoice = invoiceStore.get(req.params.id);
+    const invoice = getInvoice(req.params.id);
     if (!invoice) {
       return res.status(404).json({error: 'Stripe invoice not found'});
     }
     invoice.status = 'paid';
-    invoiceStore.set(req.params.id, invoice);
+    upsertInvoice(invoice);
     console.log(`Stripe invoice ${req.params.id} marked paid`);
     res.json({invoice, ts: new Date().toISOString()});
   } catch (err: any) {
