@@ -31,6 +31,7 @@ Sustained operations with continuous improvement. The product is live — now ma
 |-------|----------|--------|
 | **Analytics Reporter** | KPI dashboard update | Daily metrics snapshot |
 | **Support Responder** | Issue triage and resolution | Support ticket summary |
+| **Social Media Automation Agent** | Draft, schedule, and monitor approved social posts | Daily social queue report |
 | **Infrastructure Maintainer** | System health check | Health status report |
 
 ### Weekly

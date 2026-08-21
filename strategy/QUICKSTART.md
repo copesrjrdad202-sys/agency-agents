@@ -86,6 +86,7 @@ Team: Content Creator, Twitter Engager, Instagram Curator, Reddit Community Buil
 Brand Guardian reviews all content before publishing.
 Analytics Reporter tracks performance daily.
 Growth Hacker optimizes channels weekly.
+Social Media Automation Agent owns separate platform keys and enforces publish scopes.
 ```
 
 ### Conduct a Compliance Audit
