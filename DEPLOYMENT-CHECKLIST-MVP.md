@@ -157,6 +157,8 @@ Step 8: "Questions? I'm here to help. Email me anytime."
 **Owner:** You  
 **Why:** Removes friction, ensures customers get set up correctly
 
+- [ ] Mirror the script in [CUSTOMER-ONBOARDING-FLOW.md](./CUSTOMER-ONBOARDING-FLOW.md)
+
 ---
 
 ### 10. Demo Call Preparation
@@ -171,6 +173,14 @@ Step 8: "Questions? I'm here to help. Email me anytime."
 **Time:** 30 minutes  
 **Owner:** You  
 **Why:** When someone replies to cold email, you respond within 1 hour with demo link
+
+### 10b. Legal Launch Pack
+- [ ] Route the legal pass through the listed legal reviewer first
+- [ ] Review [TERMS-OF-SERVICE.md](./TERMS-OF-SERVICE.md)
+- [ ] Review [PRIVACY-POLICY.md](./PRIVACY-POLICY.md)
+- [ ] Review [DATA-PROCESSING-ADDENDUM.md](./DATA-PROCESSING-ADDENDUM.md)
+- [ ] Complete [LEGAL-LAUNCH-CHECKLIST.md](./LEGAL-LAUNCH-CHECKLIST.md)
+- [ ] Get counsel sign-off before public launch
 
 ---
 
