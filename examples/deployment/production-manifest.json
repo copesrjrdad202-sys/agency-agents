@@ -45,6 +45,27 @@
       "scope": "ledger-write"
     },
     {
+      "name": "pnl",
+      "entrypoint": "pnlAgent.ts",
+      "port": 3950,
+      "kind": "agent",
+      "scope": "finance-read"
+    },
+    {
+      "name": "social-broker",
+      "entrypoint": "socialAccessBroker.ts",
+      "port": 3960,
+      "kind": "connector",
+      "scope": "social-write"
+    },
+    {
+      "name": "social-media-automation",
+      "entrypoint": "socialMediaAutomationAgent.ts",
+      "port": 3961,
+      "kind": "agent",
+      "scope": "social-write"
+    },
+    {
       "name": "stripe-live",
       "entrypoint": "stripeConnectorLive.ts",
       "port": 3500,

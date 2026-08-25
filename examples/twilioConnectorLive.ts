@@ -24,7 +24,7 @@ app.use(bodyParser.urlencoded({extended: false}));
 app.get('/health', (_req, res) => res.json({status: 'ok', ts: new Date().toISOString(), provider: 'twilio-live'}));
 
 // Send SMS
-app.post('/sms/send', async (req, res) => {
+app.post(['/sms/send', '/twilio/sms/send'], async (req, res) => {
   try {
     const {to, body} = req.body;
     if (!to || !body) return res.status(400).json({error: 'Missing to or body'});
@@ -44,7 +44,7 @@ app.post('/sms/send', async (req, res) => {
 });
 
 // Send voice call with TwiML
-app.post('/voice/call', async (req, res) => {
+app.post(['/voice/call', '/twilio/voice/call'], async (req, res) => {
   try {
     const {to, message} = req.body;
     if (!to || !message) return res.status(400).json({error: 'Missing to or message'});
@@ -64,7 +64,7 @@ app.post('/voice/call', async (req, res) => {
 });
 
 // Incoming SMS webhook (Twilio calls this URL when SMS is received)
-app.post('/webhooks/sms', (req, res) => {
+app.post(['/webhooks/sms', '/twilio/webhooks/sms'], (req, res) => {
   const {From, To, Body, MessageSid} = req.body;
   console.log(`Incoming SMS from ${From}: ${Body} (SID: ${MessageSid})`);
   
@@ -76,7 +76,7 @@ app.post('/webhooks/sms', (req, res) => {
 });
 
 // Incoming voice call webhook (Twilio calls this URL when call is received)
-app.post('/webhooks/voice', (req, res) => {
+app.post(['/webhooks/voice', '/twilio/webhooks/voice'], (req, res) => {
   const {From, To, CallSid} = req.body;
   console.log(`Incoming voice call from ${From} to ${To} (SID: ${CallSid})`);
   
@@ -88,7 +88,7 @@ app.post('/webhooks/voice', (req, res) => {
 });
 
 // Get message status
-app.get('/messages/:sid', async (req, res) => {
+app.get(['/messages/:sid', '/twilio/messages/:sid'], async (req, res) => {
   try {
     const message = await client.messages(req.params.sid).fetch();
     res.json({message, ts: new Date().toISOString()});
@@ -98,7 +98,7 @@ app.get('/messages/:sid', async (req, res) => {
 });
 
 // Get call status
-app.get('/calls/:sid', async (req, res) => {
+app.get(['/calls/:sid', '/twilio/calls/:sid'], async (req, res) => {
   try {
     const call = await client.calls(req.params.sid).fetch();
     res.json({call, ts: new Date().toISOString()});

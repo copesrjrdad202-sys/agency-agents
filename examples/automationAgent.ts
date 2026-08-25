@@ -6,7 +6,8 @@ import dotenv from 'dotenv';
 dotenv.config();
 const PORT = process.env.AUTOMATION_AGENT_PORT || 3200;
 const BUSINESS_CONTEXT = process.env.BUSINESS_CONTEXT_URL || 'http://localhost:3100/businesses';
-const CALENDAR_CONNECTOR_BASE = process.env.CALENDAR_CONNECTOR_URL || 'http://localhost:3000';
+const CALENDAR_AGENT_BASE = process.env.CALENDAR_AGENT_URL || 'http://localhost:3401';
+const REMINDER_AGENT_BASE = process.env.REMINDER_AGENT_URL || 'http://localhost:3900';
 
 const app = express();
 app.use(bodyParser.json());
@@ -29,21 +30,114 @@ app.post('/process', async (req, res) => {
 
   // Decision logic (prototype)
   if (intent.type === 'book') {
-    // Build an event payload for the calendar connector
+    const requestedTime = intent.payload.requested_time || new Date(Date.now() + 60 * 60 * 1000).toISOString();
+    const durationMinutes = Number(intent.payload.duration_minutes || business?.services?.[0]?.duration_minutes || 60);
+    const serviceName = intent.payload.service_name || intent.payload.service_id || business?.services?.[0]?.name || 'Service visit';
+    const customerEmail = intent.payload.customer_email || payload.email || payload.customer?.email || `${(payload.caller || 'customer').replace(/\s+/g, '.').toLowerCase()}@example.com`;
     const event = {
-      summary: business?.branding?.displayName ? `${business.branding.displayName} - Appointment` : 'Appointment',
-      description: `Booked via AutomationAgent for ${business?.name || business_id}`,
-      start: {dateTime: intent.payload.requested_time || new Date().toISOString()},
-      end: {dateTime: new Date(Date.now() + (intent.payload.duration_minutes || 30) * 60000).toISOString()},
+      summary: business?.branding?.displayName ? `${business.branding.displayName} - ${serviceName}` : serviceName,
+      description: `Booked via AutomationAgent for ${business?.name || business_id}. Service: ${serviceName}. Customer: ${payload.caller || 'Guest'}.`,
+      start: {dateTime: requestedTime},
+      end: {dateTime: new Date(new Date(requestedTime).getTime() + durationMinutes * 60000).toISOString()},
     };
 
     try {
-      const cresp = await axios.post(`${CALENDAR_CONNECTOR_BASE}/events`, event, {timeout: 5000});
-      return res.json({action: 'booked', calendar_response: cresp.data, ts: new Date().toISOString()});
+      const cresp = await axios.post(`${CALENDAR_AGENT_BASE}/businesses/${encodeURIComponent(business_id)}/book`, event, {timeout: 5000});
+
+      const reminderPayload = {
+        business_id,
+        customer_name: payload.caller || 'Customer',
+        customer_email: customerEmail,
+        appointment_id: cresp.data?.created?.id || `appt-${Date.now()}`,
+        reminder_type: 'confirmation',
+        channel: 'email',
+        provider: 'smtp',
+        send_at: new Date(Date.now() + 60 * 1000).toISOString(),
+        message: `Hello ${payload.caller || 'Customer'}, this is a confirmation for your ${serviceName} appointment with ${business?.branding?.displayName || business?.name || 'your service team'}. We look forward to seeing you.`,
+      };
+
+      let reminderResponse = null;
+      try {
+        reminderResponse = await axios.post(`${REMINDER_AGENT_BASE}/schedule`, reminderPayload, {timeout: 5000});
+      } catch (reminderErr: any) {
+        console.warn('Reminder scheduling failed', reminderErr?.message || String(reminderErr));
+      }
+
+      return res.json({
+        action: 'booked',
+        calendar_response: cresp.data,
+        reminder_response: reminderResponse?.data || null,
+        ts: new Date().toISOString(),
+      });
     } catch (err: any) {
       const message = err instanceof Error ? err.message : String(err);
       console.error('Calendar booking failed', message);
       return res.status(502).json({action: 'error', error: message});
+    }
+  }
+
+  if (intent.type === 'modify_booking' || intent.type === 'cancel_booking' || intent.type === 'update_booking') {
+    const bookingId = intent.payload.target_event_id || intent.payload.event_id || intent.payload.appointment_id || intent.payload.booking_id;
+    const calendarId = intent.payload.calendar_id || 'primary';
+    const isCancel = intent.type === 'cancel_booking' || (intent.payload.action || '').toLowerCase() === 'cancel';
+
+    try {
+      if (isCancel) {
+        if (!bookingId) {
+          return res.status(400).json({ action: 'error', error: 'Missing booking id for cancellation', ts: new Date().toISOString() });
+        }
+
+        const cancelResp = await axios.delete(`${CALENDAR_AGENT_BASE}/businesses/${encodeURIComponent(business_id)}/cancel/${encodeURIComponent(bookingId)}`, { params: { calendarId }, timeout: 5000 });
+        let reminderResp: any = null;
+        try {
+          reminderResp = await axios.delete(`${REMINDER_AGENT_BASE}/appointments/${encodeURIComponent(bookingId)}/reminders`, { timeout: 5000 });
+        } catch (reminderErr: any) {
+          console.warn('Reminder cancellation failed', reminderErr?.message || String(reminderErr));
+        }
+
+        return res.json({ action: 'cancelled', calendar_response: cancelResp.data, reminder_response: reminderResp?.data || null, ts: new Date().toISOString() });
+      }
+
+      if (!bookingId) {
+        return res.status(400).json({ action: 'error', error: 'Missing booking id for update', ts: new Date().toISOString() });
+      }
+
+      const requestedTime = intent.payload.requested_time || new Date(Date.now() + 60 * 60 * 1000).toISOString();
+      const durationMinutes = Number(intent.payload.duration_minutes || business?.services?.[0]?.duration_minutes || 60);
+      const summary = business?.branding?.displayName ? `${business.branding.displayName} - ${intent.payload.service_name || 'Service'} ` : 'Service Appointment';
+      const eventUpdate = {
+        summary: summary.trim(),
+        description: `Updated via AutomationAgent for ${business?.name || business_id}.`,
+        calendarId,
+        start: { dateTime: requestedTime },
+        end: { dateTime: new Date(new Date(requestedTime).getTime() + durationMinutes * 60000).toISOString() },
+      };
+
+      const updateResp = await axios.put(`${CALENDAR_AGENT_BASE}/businesses/${encodeURIComponent(business_id)}/update/${encodeURIComponent(bookingId)}`, eventUpdate, { timeout: 5000 });
+
+      let reminderResp: any = null;
+      try {
+        await axios.delete(`${REMINDER_AGENT_BASE}/appointments/${encodeURIComponent(bookingId)}/reminders`, { timeout: 5000 });
+        reminderResp = await axios.post(`${REMINDER_AGENT_BASE}/schedule`, {
+          business_id,
+          customer_name: payload.caller || 'Customer',
+          customer_email: intent.payload.customer_email || payload.email || `${(payload.caller || 'customer').replace(/\s+/g, '.').toLowerCase()}@example.com`,
+          appointment_id: bookingId,
+          reminder_type: 'confirmation',
+          channel: 'email',
+          provider: 'smtp',
+          send_at: new Date(Date.now() + 60 * 1000).toISOString(),
+          message: `This is a reminder that your ${intent.payload.service_name || 'appointment'} has been updated. Please confirm the details with ${business?.branding?.displayName || business?.name || 'your service team'}.`,
+        }, { timeout: 5000 });
+      } catch (reminderErr: any) {
+        console.warn('Reminder resync failed', reminderErr?.message || String(reminderErr));
+      }
+
+      return res.json({ action: 'updated', calendar_response: updateResp.data, reminder_response: reminderResp?.data || null, ts: new Date().toISOString() });
+    } catch (err: any) {
+      const message = err instanceof Error ? err.message : String(err);
+      console.error('Calendar modify failed', message);
+      return res.status(502).json({ action: 'error', error: message });
     }
   }
 

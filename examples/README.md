@@ -55,6 +55,8 @@ If you're preparing a launch build from this prototype, use:
 - `npm run build`
 - `npm run validate:prod`
 - `npm run package:prod`
+- `npm run start:prod`
+- `Dockerfile` for container deployment
 
 GitHub Actions deploy scaffold:
 
@@ -69,3 +71,27 @@ Required production secrets:
 - `TWILIO_PHONE_NUMBER`
 - `GOOGLE_CLIENT_ID`
 - `GOOGLE_CLIENT_SECRET`
+
+## No-spend validation
+
+Before paying for production subscriptions, run the sandbox gate:
+
+- `npm run typecheck`
+- `npm run build`
+- `npm run validate:no-spend`
+
+This validates the in-house booking, reminder, update/cancel, and voice intake flow without any paid vendor keys.
+
+## Sandbox credential validation
+
+Use this before spending money on live subscriptions:
+
+- `npm run validate:sandbox`
+
+This checks whether Stripe and ElevenLabs test credentials are configured and ready. If keys are missing, it returns a clear `DEFERRED` result instead of pretending the live flow is validated.
+
+## P&L agent
+
+- `npm run start:pnl`
+
+This exposes JSON P&L snapshots and a simple dashboard view from the internal invoice, payment, and tax data.

@@ -3,6 +3,7 @@ import open from 'open';
 import {google} from 'googleapis';
 import fs from 'fs';
 import path from 'path';
+import { saveCalendarTokens } from './persistentDb';
 
 // Usage:
 // 1) node onboardGoogleClient.js <businessId> <GOOGLE_CLIENT_ID> <GOOGLE_CLIENT_SECRET> [PORT]
@@ -38,6 +39,7 @@ app.get('/oauth2callback', async (req, res) => {
     const {tokens} = await oauth2Client.getToken(code);
     oauth2Client.setCredentials(tokens);
     fs.writeFileSync(TOKENS_OUTPUT, JSON.stringify({client_id: CLIENT_ID, client_secret: CLIENT_SECRET, redirect_uri: REDIRECT_URI, tokens}, null, 2));
+    saveCalendarTokens(businessId, tokens);
     console.log(`Tokens saved to ${TOKENS_OUTPUT}`);
     res.send(`Authorization complete. Tokens saved to ${TOKENS_OUTPUT}. You may close this window.`);
     setTimeout(() => process.exit(0), 1000);
