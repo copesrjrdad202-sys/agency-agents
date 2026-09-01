@@ -12,6 +12,9 @@ const REMINDER_AGENT_BASE = process.env.REMINDER_AGENT_URL || 'http://localhost:
 const app = express();
 app.use(bodyParser.json());
 
+const STRIPE_CONNECTOR_BASE = process.env.STRIPE_CONNECTOR_URL || 'http://localhost:3500';
+const PAYMENT_AGENT_BASE = process.env.PAYMENT_AGENT_URL || 'http://localhost:3600';
+
 app.post('/process', async (req, res) => {
   const payload = req.body;
   const {business_id, intent} = payload;
@@ -142,9 +145,50 @@ app.post('/process', async (req, res) => {
   }
 
   if (intent.type === 'invoice') {
-    // In a full system, would call Invoice Agent. For prototype, return structured invoice request
-    const invoiceRequest = {business_id, amount_cents: intent.payload.amount_cents, description: intent.payload.description};
-    return res.json({action: 'create_invoice', invoiceRequest, ts: new Date().toISOString()});
+    const amount_cents = intent.payload.amount_cents;
+    const description = intent.payload.description || 'Service invoice';
+    const customer_email = intent.payload.customer_email || payload.email || `${(payload.caller || 'customer').replace(/\s+/g, '.').toLowerCase()}@example.com`;
+    
+    if (!amount_cents) {
+      return res.status(400).json({action: 'error', error: 'Missing amount_cents', ts: new Date().toISOString()});
+    }
+
+    try {
+      const stripeResp = await axios.post(`${STRIPE_CONNECTOR_BASE}/invoices`, {
+        amount_cents,
+        currency: 'usd',
+        description,
+        customer_email,
+        business_id,
+        metadata: {service: description, business_id}
+      }, {timeout: 5000});
+
+      let paymentRecord: any = null;
+      try {
+        paymentRecord = await axios.post(`${PAYMENT_AGENT_BASE}/payments`, {
+          invoice_id: stripeResp.data?.invoice?.id,
+          business_id,
+          amount_cents,
+          payment_method: 'stripe',
+          status: 'pending',
+          reference: stripeResp.data?.invoice?.id
+        }, {timeout: 5000});
+      } catch (payErr: any) {
+        console.warn('Payment recording failed', payErr?.message || String(payErr));
+      }
+
+      return res.json({
+        action: 'invoice_created',
+        invoice: stripeResp.data?.invoice,
+        payment_link: stripeResp.data?.payment_link,
+        payment_record: paymentRecord?.data?.payment || null,
+        ts: new Date().toISOString()
+      });
+    } catch (err: any) {
+      const message = err instanceof Error ? err.message : String(err);
+      console.error('Stripe invoice creation failed', message);
+      return res.status(502).json({action: 'error', error: message, ts: new Date().toISOString()});
+    }
   }
 
   if (intent.type === 'question') {

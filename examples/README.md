@@ -95,3 +95,9 @@ This checks whether Stripe and ElevenLabs test credentials are configured and re
 - `npm run start:pnl`
 
 This exposes JSON P&L snapshots and a simple dashboard view from the internal invoice, payment, and tax data.
+
+## Social automation
+
+- `npm run validate:social`
+
+This validates the social access broker and social automation agent in mock mode. It creates drafts, runs brand/legal review, schedules them, and confirms publish is safely deferred when platform tokens are absent.

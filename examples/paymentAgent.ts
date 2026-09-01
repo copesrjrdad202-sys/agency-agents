@@ -24,7 +24,7 @@ app.get('/health', (_req, res) => res.json({status: 'ok', ts: new Date().toISOSt
 
 // Record a payment
 app.post(['/payments', '/businesses/:business_id/payments'], (req, res) => {
-  const {invoice_id, amount_cents, payment_method = 'stripe', reference} = req.body;
+  const {invoice_id, amount_cents, payment_method = 'stripe', status = 'completed', reference} = req.body;
   const business_id = req.body.business_id || req.params.business_id;
   if (!invoice_id || !business_id || !amount_cents) return res.status(400).json({error: 'Missing required fields'});
 
@@ -34,7 +34,7 @@ app.post(['/payments', '/businesses/:business_id/payments'], (req, res) => {
     invoice_id,
     business_id,
     amount_cents,
-    status: 'completed',
+    status,
     payment_method,
     recorded_at: new Date().toISOString(),
     reference

@@ -25,6 +25,7 @@
     "validate:prod": "node scripts/validate-production.mjs",
     "validate:no-spend": "node scripts/no-spend-validation.mjs",
     "validate:sandbox": "node scripts/sandbox-validation.mjs",
+    "validate:social": "node scripts/social-validation.mjs",
     "package:prod": "node scripts/package-production.mjs",
     "deploy:prep": "npm run typecheck && npm run build && npm run validate:prod && npm run package:prod",
     "start:prod": "node dist/prodLauncher.js"

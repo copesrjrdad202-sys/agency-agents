@@ -50,7 +50,16 @@ const children: Array<[string, number]> = [
 
 function startChild(file: string, port: number) {
   const child = spawn(process.execPath, [`${DIST_DIR}/${file}`], {
-    env: { ...process.env, PORT: String(port), BUSINESS_CONTEXT_PORT: '3100', CALENDAR_AGENT_URL: `http://127.0.0.1:3401`, CALENDAR_CONNECTOR_URL: 'http://127.0.0.1:3000', SOCIAL_ACCESS_BROKER_URL: 'http://127.0.0.1:3960' },
+    env: { 
+      ...process.env, 
+      PORT: String(port), 
+      BUSINESS_CONTEXT_PORT: '3100', 
+      CALENDAR_AGENT_URL: `http://127.0.0.1:3401`, 
+      CALENDAR_CONNECTOR_URL: 'http://127.0.0.1:3000', 
+      STRIPE_CONNECTOR_URL: 'http://127.0.0.1:3500',
+      PAYMENT_AGENT_URL: 'http://127.0.0.1:3600',
+      SOCIAL_ACCESS_BROKER_URL: 'http://127.0.0.1:3960' 
+    },
     stdio: 'inherit',
   });
   child.on('exit', (code) => {
