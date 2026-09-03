@@ -17,6 +17,7 @@
     "start:calendar": "ts-node-dev --respawn --transpile-only calendarAgent.ts",
     "start:reminder": "ts-node-dev --respawn --transpile-only reminderAgent.ts",
     "start:pnl": "ts-node-dev --respawn --transpile-only pnlAgent.ts",
+    "start:dashboard": "ts-node-dev --respawn --transpile-only dashboardAgent.ts",
     "start:social-broker": "ts-node-dev --respawn --transpile-only socialAccessBroker.ts",
     "start:social": "ts-node-dev --respawn --transpile-only socialMediaAutomationAgent.ts",
     "onboard": "ts-node-dev --respawn --transpile-only onboardGoogleClient.ts",

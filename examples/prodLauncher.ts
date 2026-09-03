@@ -26,6 +26,7 @@ const services: Service[] = [
   { name: 'elevenlabs', port: 3901, pathMatch: (p) => p.startsWith('/voice') || p.startsWith('/tts') || p === '/voice/session' || p === '/voice/transcript' || p.startsWith('/voice/') },
   { name: 'reminder', port: 3900, pathMatch: (p) => p === '/reminders' || p.startsWith('/reminders/') || /^\/businesses\/[^/]+\/reminders(\/|$)/.test(p) || p.startsWith('/schedule') || p.startsWith('/send/') || /^\/appointments\/[^/]+\/reminders(\/|$)/.test(p) || p.startsWith('/appointments/') },
   { name: 'pnl', port: 3950, pathMatch: (p) => p === '/pnl' || p.startsWith('/pnl/') || /^\/businesses\/[^/]+\/pnl(\/|$)/.test(p) || /^\/businesses\/[^/]+\/dashboard(\/|$)/.test(p) },
+  { name: 'dashboard', port: 3970, pathMatch: (p) => p === '/' || p.startsWith('/dashboard') },
   { name: 'social-broker', port: 3960, pathMatch: (p) => p.startsWith('/social-access') || p.startsWith('/social/tokens') || p.startsWith('/social/scopes') || p.startsWith('/social/audit') },
   { name: 'social-automation', port: 3961, pathMatch: (p) => p.startsWith('/social') || p.startsWith('/campaigns') || p.startsWith('/drafts') || p.startsWith('/approvals') || p.startsWith('/publishes') || p.startsWith('/engagement') },
 ];
@@ -44,6 +45,7 @@ const children: Array<[string, number]> = [
   ['reminderAgent.js', 3900],
   ['elevenLabsConnector.js', 3901],
   ['pnlAgent.js', 3950],
+  ['dashboardAgent.js', 3970],
   ['socialAccessBroker.js', 3960],
   ['socialMediaAutomationAgent.js', 3961],
 ];
@@ -110,7 +112,7 @@ const server = http.createServer((req, res) => {
   const parsed = new URL(req.url || '/', `http://${req.headers.host || 'localhost'}`);
   const pathname = parsed.pathname;
 
-  if (pathname === '/' || pathname === '/health') {
+  if (pathname === '/health') {
     res.writeHead(200, { 'Content-Type': 'application/json' });
     res.end(JSON.stringify({
       status: 'ok',
