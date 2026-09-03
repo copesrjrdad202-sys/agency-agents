@@ -10,21 +10,28 @@ const AUTH_TOKEN = process.env.TWILIO_AUTH_TOKEN;
 const TWILIO_PHONE = process.env.TWILIO_PHONE_NUMBER;
 
 if (!ACCOUNT_SID || !AUTH_TOKEN || !TWILIO_PHONE) {
-  console.error('Error: TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN, or TWILIO_PHONE_NUMBER not set in environment.');
-  console.error('Get Twilio credentials from https://www.twilio.com/console');
-  process.exit(1);
+  console.warn('Warning: TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN, or TWILIO_PHONE_NUMBER not set.');
+  console.warn('Twilio routes will return deferred responses until configured. Get credentials from https://www.twilio.com/console');
 }
 
-const client = twilio(ACCOUNT_SID, AUTH_TOKEN);
+const client = (ACCOUNT_SID && AUTH_TOKEN) ? twilio(ACCOUNT_SID, AUTH_TOKEN) : null;
 
 const app = express();
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: false}));
 
-app.get('/health', (_req, res) => res.json({status: 'ok', ts: new Date().toISOString(), provider: 'twilio-live'}));
+app.get('/health', (_req, res) => res.json({
+  status: 'ok',
+  ts: new Date().toISOString(),
+  provider: 'twilio-live',
+  configured: Boolean(client && TWILIO_PHONE),
+}));
 
 // Send SMS
 app.post(['/sms/send', '/twilio/sms/send'], async (req, res) => {
+  if (!client || !TWILIO_PHONE) {
+    return res.status(503).json({status: 'deferred', error: 'Twilio credentials not configured', ts: new Date().toISOString()});
+  }
   try {
     const {to, body} = req.body;
     if (!to || !body) return res.status(400).json({error: 'Missing to or body'});
@@ -45,6 +52,9 @@ app.post(['/sms/send', '/twilio/sms/send'], async (req, res) => {
 
 // Send voice call with TwiML
 app.post(['/voice/call', '/twilio/voice/call'], async (req, res) => {
+  if (!client || !TWILIO_PHONE) {
+    return res.status(503).json({status: 'deferred', error: 'Twilio credentials not configured', ts: new Date().toISOString()});
+  }
   try {
     const {to, message} = req.body;
     if (!to || !message) return res.status(400).json({error: 'Missing to or message'});
@@ -89,6 +99,9 @@ app.post(['/webhooks/voice', '/twilio/webhooks/voice'], (req, res) => {
 
 // Get message status
 app.get(['/messages/:sid', '/twilio/messages/:sid'], async (req, res) => {
+  if (!client) {
+    return res.status(503).json({status: 'deferred', error: 'Twilio credentials not configured', ts: new Date().toISOString()});
+  }
   try {
     const message = await client.messages(req.params.sid).fetch();
     res.json({message, ts: new Date().toISOString()});
@@ -99,6 +112,9 @@ app.get(['/messages/:sid', '/twilio/messages/:sid'], async (req, res) => {
 
 // Get call status
 app.get(['/calls/:sid', '/twilio/calls/:sid'], async (req, res) => {
+  if (!client) {
+    return res.status(503).json({status: 'deferred', error: 'Twilio credentials not configured', ts: new Date().toISOString()});
+  }
   try {
     const call = await client.calls(req.params.sid).fetch();
     res.json({call, ts: new Date().toISOString()});

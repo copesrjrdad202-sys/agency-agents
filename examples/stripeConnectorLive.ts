@@ -10,12 +10,11 @@ const PORT = process.env.STRIPE_CONNECTOR_PORT || 3500;
 const STRIPE_API_KEY = process.env.STRIPE_API_KEY;
 
 if (!STRIPE_API_KEY) {
-  console.error('Error: STRIPE_API_KEY not set in environment. Set it in .env or export it.');
-  console.error('Get a Stripe API key from https://dashboard.stripe.com/apikeys');
-  process.exit(1);
+  console.warn('Warning: STRIPE_API_KEY not set. Stripe routes will return deferred responses until it is configured.');
+  console.warn('Get a Stripe API key from https://dashboard.stripe.com/apikeys');
 }
 
-const stripe = new Stripe(STRIPE_API_KEY);
+const stripe = STRIPE_API_KEY ? new Stripe(STRIPE_API_KEY) : null;
 
 type LocalInvoice = {
   id: string;
@@ -33,10 +32,22 @@ type LocalInvoice = {
 const app = express();
 app.use(bodyParser.json());
 
-app.get('/health', (_req, res) => res.json({status: 'ok', ts: new Date().toISOString(), provider: 'stripe-live'}));
+app.get('/health', (_req, res) => res.json({
+  status: 'ok',
+  ts: new Date().toISOString(),
+  provider: 'stripe-live',
+  configured: Boolean(stripe),
+}));
 
 // Create invoice and return payment link
 async function createInvoiceHandler(req: any, res: any) {
+  if (!stripe) {
+    return res.status(503).json({
+      status: 'deferred',
+      error: 'STRIPE_API_KEY not configured',
+      ts: new Date().toISOString(),
+    });
+  }
   try {
     const {amount_cents, currency = 'usd', description = '', customer_email, business_id, metadata = {}} = req.body;
     if (!amount_cents) return res.status(400).json({error: 'Missing amount_cents'});
@@ -135,6 +146,14 @@ app.post(['/invoices/:id/mark-paid', '/stripe/invoices/:id/mark-paid'], async (r
 app.post(['/webhooks', '/stripe/webhooks'], bodyParser.raw({type: 'application/json'}), async (req, res) => {
   const sig = req.headers['stripe-signature'] as string;
   const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
+
+  if (!stripe) {
+    return res.status(503).json({
+      status: 'deferred',
+      error: 'STRIPE_API_KEY not configured',
+      ts: new Date().toISOString(),
+    });
+  }
 
   if (!webhookSecret) {
     console.warn('STRIPE_WEBHOOK_SECRET not set; skipping signature verification');
