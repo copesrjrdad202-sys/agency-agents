@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Voice AI Agent — Demo</title>
+<style>
+  :root {
+    --bg: #0f172a;
+    --panel: #1e293b;
+    --accent: #38bdf8;
+    --accent-dark: #0284c7;
+    --text: #e2e8f0;
+    --muted: #94a3b8;
+    --user-bubble: #334155;
+    --ai-bubble: #0369a1;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-height: 100vh;
+    padding: 24px 16px;
+  }
+  h1 { font-size: 1.4rem; margin-bottom: 4px; }
+  p.subtitle { color: var(--muted); margin-top: 0; font-size: 0.9rem; }
+  .container {
+    width: 100%;
+    max-width: 640px;
+    background: var(--panel);
+    border-radius: 16px;
+    padding: 20px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+  }
+  #transcript {
+    height: 380px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding: 8px;
+    margin-bottom: 16px;
+  }
+  .bubble {
+    max-width: 80%;
+    padding: 10px 14px;
+    border-radius: 14px;
+    line-height: 1.4;
+    font-size: 0.95rem;
+    white-space: pre-wrap;
+  }
+  .bubble.user { align-self: flex-end; background: var(--user-bubble); border-bottom-right-radius: 4px; }
+  .bubble.ai { align-self: flex-start; background: var(--ai-bubble); border-bottom-left-radius: 4px; }
+  .bubble.system { align-self: center; background: transparent; color: var(--muted); font-size: 0.8rem; }
+  .controls {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    justify-content: center;
+  }
+  #micBtn {
+    width: 68px;
+    height: 68px;
+    border-radius: 50%;
+    border: none;
+    background: var(--accent);
+    color: #04263a;
+    font-size: 1.6rem;
+    cursor: pointer;
+    transition: transform 0.15s, background 0.15s;
+  }
+  #micBtn:hover { background: var(--accent-dark); }
+  #micBtn.recording { background: #ef4444; transform: scale(1.08); }
+  #status { font-size: 0.85rem; color: var(--muted); min-height: 1.2em; }
+  .row { display: flex; flex-direction: column; align-items: center; gap: 8px; width: 100%; }
+  input[type=text] {
+    flex: 1;
+    padding: 10px 12px;
+    border-radius: 10px;
+    border: 1px solid #334155;
+    background: #0b1220;
+    color: var(--text);
+    font-size: 0.95rem;
+  }
+  .textRow { display: flex; gap: 8px; width: 100%; margin-top: 8px; }
+  button.sendBtn {
+    padding: 10px 16px;
+    border-radius: 10px;
+    border: none;
+    background: var(--accent);
+    color: #04263a;
+    font-weight: 600;
+    cursor: pointer;
+  }
+  audio { display: none; }
+</style>
+</head>
+<body>
+  <h1>🎙️ Voice AI Agent</h1>
+  <p class="subtitle">Zero Investment Voice System — browser demo (STT → Claude → TTS)</p>
+
+  <div class="container">
+    <div id="transcript"></div>
+    <div class="row">
+      <button id="micBtn" title="Hold or click to talk">🎤</button>
+      <div id="status">Click the mic and speak, or type below.</div>
+      <div class="textRow">
+        <input type="text" id="textInput" placeholder="Or type a message..." />
+        <button class="sendBtn" id="sendBtn">Send</button>
+      </div>
+    </div>
+  </div>
+
+  <audio id="player"></audio>
+
+  <script src="client.js"></script>
+</body>
+</html>

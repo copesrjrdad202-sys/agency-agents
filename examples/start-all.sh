@@ -38,6 +38,9 @@ npx ts-node-dev --respawn --transpile-only taxAgent.ts &
 echo -e "${BLUE}Starting Twilio Connector (port 3800)...${NC}"
 npx ts-node-dev --respawn --transpile-only twilioConnector.ts &
 
+echo -e "${BLUE}Starting Voice AI Agent (port 3000... wait, check its own PORT)...${NC}"
+(cd ../voice-ai-agent && npm start) &
+
 echo ""
 echo -e "${GREEN}All services started in background.${NC}"
 echo -e "${BLUE}Monitor logs above. Press Ctrl+C to stop all services.${NC}"
@@ -52,6 +55,7 @@ echo "  - Stripe Connector: http://localhost:3500"
 echo "  - Payment Agent: http://localhost:3600"
 echo "  - Tax Agent: http://localhost:3700"
 echo "  - Twilio Connector: http://localhost:3800"
+echo "  - Voice AI Agent: http://localhost:3950 (see voice-ai-agent/.env PORT)"
 echo ""
 
 wait
