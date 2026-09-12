@@ -1,0 +1,67 @@
+{
+  "_comment": "Sample payload template for wiring this app into a Make.com (Integromat) scenario on the free plan. Use an HTTP module 'Make a request' pointed at your deployed server, or a Custom Webhook trigger that receives this shape from AUTOMATION_WEBHOOK_URL after a booking is confirmed.",
+  "scenario_examples": {
+    "incoming_call_trigger": {
+      "description": "Webhook trigger module: 'Custom webhook' listening for a new call/message and forwarding audio or text to this app's /api/voice/incoming endpoint.",
+      "method": "POST",
+      "url": "https://YOUR_DEPLOYED_HOST/api/voice/incoming",
+      "content_type": "multipart/form-data",
+      "body_fields": {
+        "audio": "(binary audio file from the call recording, e.g. WEBM/OPUS or WAV/LINEAR16)",
+        "sessionId": "{{optional - reuse to keep conversation context across turns}}",
+        "callerPhone": "{{caller's phone number from the telephony provider}}",
+        "encoding": "WEBM_OPUS",
+        "sampleRateHertz": "48000"
+      },
+      "expected_response": {
+        "sessionId": "uuid-string",
+        "transcript": "what the caller said",
+        "reply": "Ava's spoken reply text",
+        "audioBase64": "base64-encoded MP3 audio to play back to the caller",
+        "audioMimeType": "audio/mpeg",
+        "toolCalls": [],
+        "elapsedMs": 850
+      }
+    },
+    "check_availability_module": {
+      "description": "HTTP module to check open slots before offering times to a caller/lead via a chatbot flow.",
+      "method": "POST",
+      "url": "https://YOUR_DEPLOYED_HOST/api/calendar/check",
+      "content_type": "application/json",
+      "body": {
+        "date": "2026-09-10",
+        "time": "14:00"
+      }
+    },
+    "book_appointment_module": {
+      "description": "HTTP module to finalize a booking once the caller confirms a slot.",
+      "method": "POST",
+      "url": "https://YOUR_DEPLOYED_HOST/api/calendar/book",
+      "content_type": "application/json",
+      "body": {
+        "client_name": "Jane Doe",
+        "phone_number": "+15551234567",
+        "date": "2026-09-10",
+        "time": "14:00",
+        "service_type": "AC repair"
+      }
+    },
+    "automation_webhook_receiver": {
+      "description": "If AUTOMATION_WEBHOOK_URL is set in .env, this app POSTs here automatically right after every successful booking so Make.com can send SMS/email confirmations, update a CRM, or notify a technician.",
+      "incoming_payload_shape": {
+        "event": "appointment.booked",
+        "payload": {
+          "confirmed": true,
+          "confirmationId": "MOCK-LZ3K9X2A",
+          "details": {
+            "clientName": "Jane Doe",
+            "phoneNumber": "+15551234567",
+            "date": "2026-09-10",
+            "time": "14:00",
+            "serviceType": "AC repair"
+          }
+        }
+      }
+    }
+  }
+}

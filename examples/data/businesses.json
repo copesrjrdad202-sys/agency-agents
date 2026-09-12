@@ -1,0 +1,23 @@
+{
+  "prototype:google-stripe-twilio": {
+    "id": "prototype:google-stripe-twilio",
+    "name": "Prototype Multi-Agent Business",
+    "branding": {
+      "displayName": "Acme Services",
+      "greeting": "Welcome to Acme Services! How can we help you today?",
+      "brandColor": "#0077CC"
+    },
+    "services": [
+      { "id": "svc-1", "name": "Consultation", "description": "30-minute consultation", "price_cents": 5000, "duration_minutes": 30 },
+      { "id": "svc-2", "name": "Full Service", "description": "2-hour full service", "price_cents": 20000, "duration_minutes": 120 }
+    ],
+    "calendar": {
+      "provider": "google",
+      "credentialsPath": "./google_tokens.json",
+      "calendarId": "primary"
+    },
+    "invoiceTemplate": "default-simple",
+    "taxSheetPath": "./tax_sheet.csv",
+    "contact": { "phone": "+15555551212", "email": "hello@acme.example" }
+  }
+}

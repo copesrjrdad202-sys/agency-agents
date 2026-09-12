@@ -55,6 +55,10 @@ coverage/
 # Build outputs
 dist/
 build/
+examples/dist/
+examples/release/
+examples/data/app-db.json
+examples/data/social-store.json
 *.egg-info/
 
 # Personal notes and scratch files

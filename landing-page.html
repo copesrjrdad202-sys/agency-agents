@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AI Receptionist for Contractors</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 0; color: #111; line-height: 1.5; }
+    header, section, footer { padding: 48px 20px; max-width: 1000px; margin: 0 auto; }
+    header { background: #0f172a; color: #fff; }
+    .hero { display: grid; gap: 24px; grid-template-columns: 1.2fr 1fr; align-items: center; }
+    .card { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 16px; padding: 24px; }
+    .btn { display: inline-block; padding: 14px 22px; border-radius: 10px; text-decoration: none; }
+    .btn-primary { background: #2563eb; color: #fff; }
+    .btn-secondary { background: #fff; color: #111; margin-left: 10px; }
+    .grid { display: grid; gap: 20px; grid-template-columns: repeat(3, 1fr); }
+    .price { font-size: 40px; font-weight: 700; }
+    .muted { color: #475569; }
+    ul { padding-left: 20px; }
+    .faq details { margin-bottom: 12px; }
+    footer { border-top: 1px solid #e2e8f0; color: #475569; }
+    @media (max-width: 800px) {
+      .hero, .grid { grid-template-columns: 1fr; }
+      .btn-secondary { margin-left: 0; margin-top: 12px; display: inline-block; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="hero">
+      <div>
+        <h1>An AI Receptionist That Never Misses a Call</h1>
+        <p>Answer every call. Book faster. Get paid faster. Know your profits automatically.</p>
+        <p>
+          <a class="btn btn-primary" href="#signup">Start Your Free 30-Day Trial</a>
+          <a class="btn btn-secondary" href="#pricing">See Pricing</a>
+        </p>
+        <p class="muted">Built for plumbers, HVAC, and electricians.</p>
+      </div>
+      <div class="card">
+        <h3>What it does</h3>
+        <ul>
+          <li>Answers phone calls and messages</li>
+          <li>Answers pricing / hours / service questions</li>
+          <li>Books appointments automatically</li>
+          <li>Sends invoices and payment links</li>
+          <li>Updates your tax sheet in real time</li>
+          <li>Shows P&L and profit every day</li>
+        </ul>
+      </div>
+    </div>
+  </header>
+
+  <section>
+    <h2>The Problem</h2>
+    <p>Every missed call is lost revenue. Every manual booking wastes time. Every unpaid invoice slows cash flow. Every tax spreadsheet creates stress.</p>
+    <div class="grid">
+      <div class="card"><strong>Missed calls</strong><p class="muted">Customers call while you're on a job site and go to voicemail.</p></div>
+      <div class="card"><strong>Manual booking</strong><p class="muted">Back-and-forth texts take time and create double-bookings.</p></div>
+      <div class="card"><strong>No profit visibility</strong><p class="muted">You shouldn't have to guess whether the business is actually making money.</p></div>
+    </div>
+  </section>
+
+  <section>
+    <h2>The Solution</h2>
+    <div class="grid">
+      <div class="card"><strong>AI answers every call</strong><p class="muted">Uses your business profile to answer common questions accurately.</p></div>
+      <div class="card"><strong>AI books appointments</strong><p class="muted">Checks availability, schedules the job, and sends confirmation.</p></div>
+      <div class="card"><strong>AI tracks revenue</strong><p class="muted">Invoices, payments, taxes, and P&L update automatically.</p></div>
+    </div>
+  </section>
+
+  <section id="pricing">
+    <h2>Pricing</h2>
+    <div class="grid">
+      <div class="card">
+        <h3>Starter</h3>
+        <div class="price">$99</div>
+        <p class="muted">One feature, one job.</p>
+      </div>
+      <div class="card" style="border: 2px solid #2563eb;">
+        <h3>Complete Suite</h3>
+        <div class="price">$500</div>
+        <p class="muted">Everything: calls, booking, invoicing, payments, tax, P&L.</p>
+      </div>
+      <div class="card">
+        <h3>Add-ons</h3>
+        <p class="muted">Advanced reporting, extra workflows, premium support.</p>
+      </div>
+    </div>
+  </section>
+
+  <section id="signup">
+    <h2>Start Your Free Trial</h2>
+    <p>We’ll help you connect Stripe, Google Calendar, and Twilio during onboarding.</p>
+    <form class="card">
+      <label>
+        Business email<br />
+        <input type="email" name="email" style="width:100%;padding:12px;margin-top:8px;" placeholder="you@company.com" />
+      </label>
+      <p><button class="btn btn-primary" type="submit">Request Access</button></p>
+      <p class="muted">No credit card required for the trial.</p>
+    </form>
+  </section>
+
+  <section class="faq">
+    <h2>FAQ</h2>
+    <details><summary>Does it answer questions too?</summary><p>Yes. It answers hours, pricing, services, and availability before booking.</p></details>
+    <details><summary>Can it book appointments?</summary><p>Yes. It checks your calendar and creates the booking automatically.</p></details>
+    <details><summary>Is it legal/compliant?</summary><p>Use the linked Terms, Privacy Policy, and DPA, and get counsel sign-off before launch.</p></details>
+  </section>
+
+  <footer>
+    <p>
+      <a href="./TERMS-OF-SERVICE.md">Terms of Service</a> ·
+      <a href="./PRIVACY-POLICY.md">Privacy Policy</a> ·
+      <a href="./DATA-PROCESSING-ADDENDUM.md">DPA</a>
+    </p>
+  </footer>
+</body>
+</html>

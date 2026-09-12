@@ -46,3 +46,58 @@ If you run an interesting multi-agent exercise, consider adding it here. Good ex
 - Multiple agents collaborating on a shared objective
 - The breadth of the agency's capabilities
 - Real-world applicability of the agent definitions
+
+## Production Scaffold
+
+If you're preparing a launch build from this prototype, use:
+
+- `npm run typecheck`
+- `npm run build`
+- `npm run validate:prod`
+- `npm run package:prod`
+- `npm run start:prod`
+- `Dockerfile` for container deployment
+
+GitHub Actions deploy scaffold:
+
+- `.github/workflows/deploy-examples.yml`
+
+Required production secrets:
+
+- `STRIPE_SECRET_KEY`
+- `STRIPE_WEBHOOK_SECRET`
+- `TWILIO_ACCOUNT_SID`
+- `TWILIO_AUTH_TOKEN`
+- `TWILIO_PHONE_NUMBER`
+- `GOOGLE_CLIENT_ID`
+- `GOOGLE_CLIENT_SECRET`
+
+## No-spend validation
+
+Before paying for production subscriptions, run the sandbox gate:
+
+- `npm run typecheck`
+- `npm run build`
+- `npm run validate:no-spend`
+
+This validates the in-house booking, reminder, update/cancel, and voice intake flow without any paid vendor keys.
+
+## Sandbox credential validation
+
+Use this before spending money on live subscriptions:
+
+- `npm run validate:sandbox`
+
+This checks whether Stripe and ElevenLabs test credentials are configured and ready. If keys are missing, it returns a clear `DEFERRED` result instead of pretending the live flow is validated.
+
+## P&L agent
+
+- `npm run start:pnl`
+
+This exposes JSON P&L snapshots and a simple dashboard view from the internal invoice, payment, and tax data.
+
+## Social automation
+
+- `npm run validate:social`
+
+This validates the social access broker and social automation agent in mock mode. It creates drafts, runs brand/legal review, schedules them, and confirms publish is safely deferred when platform tokens are absent.

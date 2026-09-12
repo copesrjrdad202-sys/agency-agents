@@ -36,6 +36,16 @@ You're launching a coordinated marketing campaign across multiple channels. Cont
 | Executive Summary Generator | Campaign reporting |
 | Legal Compliance Checker | Ad compliance, disclosure requirements |
 
+### Access Control
+| Scope | Owner | Permission |
+|-------|-------|------------|
+| Draft content | Content Creator | Write drafts only |
+| Public publish | Platform-specific social agent | Publish only after approval |
+| Analytics | Analytics Reporter | Read only |
+| Brand review | Brand Guardian | Approve / reject |
+| Legal review | Legal Compliance Checker | Approve / reject |
+| Paid media | Paid Social Strategist | Ad account only |
+
 ## Execution Plan
 
 ### Week 1: Strategy & Content Creation
@@ -48,6 +58,12 @@ Day 1-2: Campaign Strategy
 │   ├── Platform selection and budget allocation
 │   ├── Content calendar (4-week plan)
 │   └── Engagement strategy per platform
+│
+├── Social Media Automation Agent → Credential and publish routing
+│   ├── Separate keys per platform
+│   ├── Read/draft/publish scope separation
+│   ├── Approval gate enforcement
+│   └── Audit logging and revocation support
 │
 ├── Trend Researcher → Market timing analysis
 │   ├── Trending topics to align with

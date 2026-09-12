@@ -1,0 +1,52 @@
+{
+  "name": "voice-ai-agent",
+  "version": "1.0.0",
+  "description": "Zero Investment Voice AI Agent - STT/TTS + Claude LLM + Calendar booking automation",
+  "main": "dist/server.js",
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "start": "node dist/server.js",
+    "dev": "nodemon --watch src --ext ts --exec ts-node src/server.ts",
+    "test": "tsx --test tests/*.test.ts",
+    "lint": "tsc --noEmit",
+    "provision": "tsx scripts/provision-business.ts",
+    "authorize:calendar": "tsx scripts/authorize-google-calendar.ts",
+    "scrape:leads": "tsx scripts/prospect-scraper.ts"
+  },
+  "keywords": [
+    "voice",
+    "ai",
+    "claude",
+    "google-speech",
+    "appointment-booking"
+  ],
+  "author": "",
+  "license": "MIT",
+  "engines": {
+    "node": ">=22.5.0"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.32.1",
+    "@google-cloud/speech": "^6.7.0",
+    "@google-cloud/text-to-speech": "^5.3.0",
+    "body-parser": "^1.20.2",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.21.1",
+    "multer": "^2.3.0",
+    "twilio": "^5.3.5",
+    "uuid": "^9.0.1",
+    "googleapis": "^144.0.0"
+  },
+  "devDependencies": {
+    "@types/cors": "^2.8.17",
+    "@types/express": "^4.17.21",
+    "@types/multer": "^2.2.0",
+    "@types/node": "^22.10.2",
+    "@types/uuid": "^9.0.8",
+    "nodemon": "^3.1.7",
+    "ts-node": "^10.9.2",
+    "tsx": "^4.19.2",
+    "typescript": "^5.6.3"
+  }
+}
