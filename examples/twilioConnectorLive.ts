@@ -87,7 +87,7 @@ app.post(['/webhooks/sms', '/twilio/webhooks/sms'], (req, res) => {
 
 const BUSINESS_CONTEXT_URL = process.env.BUSINESS_CONTEXT_URL || 'http://127.0.0.1:3100';
 const INTAKE_AGENT_URL = process.env.INTAKE_AGENT_URL || 'http://127.0.0.1:3300';
-const DEFAULT_BUSINESS_ID = process.env.DEFAULT_BUSINESS_ID || 'pilot-copejoseph75';
+const DEFAULT_BUSINESS_ID = process.env.DEFAULT_BUSINESS_ID || 'hvac-plumbing-pro';
 
 function normalizePhone(value: string | undefined | null): string {
   return (value || '').replace(/[^\d]/g, '');
