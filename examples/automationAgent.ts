@@ -15,6 +15,42 @@ app.use(bodyParser.json());
 const STRIPE_CONNECTOR_BASE = process.env.STRIPE_CONNECTOR_URL || 'http://localhost:3500';
 const PAYMENT_AGENT_BASE = process.env.PAYMENT_AGENT_URL || 'http://localhost:3600';
 
+function answerBusinessQuestion(text: string, business: any): string {
+  const lowered = (text || '').toLowerCase();
+  const displayName = business?.branding?.displayName || business?.name;
+
+  if (!business) {
+    return "I'm happy to help. Could you tell me a bit more about what you need?";
+  }
+
+  if (/price|cost|how much|rate/.test(lowered)) {
+    const list = (business.services || [])
+      .map((s: any) => `${s.name} for $${(s.price_cents / 100).toFixed(2)}`)
+      .join(', ');
+    return list ? `Here's our pricing: ${list}.` : `Let me connect you with our team for current pricing.`;
+  }
+
+  if (/service|offer|what do you do|what can you|do you do/.test(lowered)) {
+    const list = (business.services || []).map((s: any) => s.name).join(', ');
+    return list ? `${displayName} offers: ${list}. Would you like to book one of these?` : `We offer a range of services. What do you need help with?`;
+  }
+
+  if (/hour|open|close|available/.test(lowered)) {
+    return business.policies?.afterHours || `Please call during business hours and our team will be happy to help.`;
+  }
+
+  if (/emergency|urgent/.test(lowered)) {
+    return business.policies?.emergencyResponse || `We prioritize emergency requests. Let's get you scheduled right away.`;
+  }
+
+  if (/cancel|reschedule.*polic|cancellation/.test(lowered)) {
+    return business.policies?.cancellation || `Please let us know as soon as possible if you need to cancel or reschedule.`;
+  }
+
+  const topServices = (business.services || []).slice(0, 3).map((s: any) => s.name).join(', ');
+  return `Thanks for your question. ${displayName} offers ${topServices || 'a range of services'}. Would you like to book an appointment?`;
+}
+
 app.post('/process', async (req, res) => {
   const payload = req.body;
   const {business_id, intent} = payload;
@@ -192,8 +228,8 @@ app.post('/process', async (req, res) => {
   }
 
   if (intent.type === 'question') {
-    // Simple echo answer for prototype
-    return res.json({action: 'answer', answer: `Received question: ${intent.payload.text}`, ts: new Date().toISOString()});
+    const answer = answerBusinessQuestion(intent.payload.text || '', business);
+    return res.json({action: 'answer', answer, ts: new Date().toISOString()});
   }
 
   return res.json({action: 'noop', ts: new Date().toISOString()});
